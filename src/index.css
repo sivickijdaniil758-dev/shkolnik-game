@@ -7700,13 +7700,13 @@ body {
 
     .game-scene .hint-notes {
         position: absolute;
-        left: max(6px, env(safe-area-inset-left, 0px));
+        left: max(3px, env(safe-area-inset-left, 0px));
         top: 53%;
         bottom: auto;
         z-index: 12;
         flex-shrink: 0;
-        gap: 4px;
-        width: 115px;
+        gap: 3px;
+        width: 98px;
         padding-bottom: 0;
         transform: scale(.9);
         transform-origin: left top
@@ -7714,8 +7714,10 @@ body {
 
     .game-scene .hint-note {
         min-width: 0;
+        max-width: 98px;
         width: 100%;
-        padding: 5px 6px 5px 5px;
+        padding: 4px 5px 4px 4px;
+        gap: 4px;
         transform: rotate(-2deg)
     }
 
@@ -7727,17 +7729,22 @@ body {
         transform: rotate(0)translateY(-2px) scale(1.02)
     }
 
+    .game-scene .hint-note-body {
+        line-height: 1.05
+    }
+
     .game-scene .hint-note-emoji {
-        font-size: 14px
+        font-size: 13px
     }
 
     .game-scene .hint-note-title {
-        font-size: 13px !important;
+        font-size: 12px !important;
+        line-height: 1.12;
         opacity: 1
     }
 
     .game-scene .hint-note-count {
-        font-size: 20px !important
+        font-size: 18px !important
     }
 
     .game-scene .notebook-desk {
@@ -7898,7 +7905,7 @@ body {
 
     .game-scene .hint-notes {
         top: 50%;
-        transform: scale(.88);
+        transform: scale(.87);
         transform-origin: left top
     }
 
