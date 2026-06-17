@@ -7665,85 +7665,107 @@ body {
     }
 
     .game-scene-ui {
-        padding: 46px 0 14px;
+        padding: 46px 0 0;
         overflow-x: hidden
     }
 
+    .game-scene-photo .classroom-photo-img {
+        object-position: center 36%
+    }
+
     .game-scene .game-play-zone {
-        justify-content: center;
-        align-items: flex-end;
+        flex: 1;
+        justify-content: flex-end;
+        align-items: stretch;
         gap: 0;
         width: 100%;
         max-width: 100%;
+        min-height: 0;
         margin: 0;
-        padding: 0 0 8px;
+        padding: 0;
         position: relative;
-        overflow: visible
+        overflow: hidden
     }
 
     .game-scene .hint-notes {
         position: absolute;
-        left: max(2px, env(safe-area-inset-left, 0px));
-        bottom: 6px;
+        left: max(8px, env(safe-area-inset-left, 0px));
+        bottom: calc(82px + min(210px, 34vh) + 14px);
         z-index: 12;
         flex-shrink: 0;
-        gap: 4px;
-        width: min(78px, 20vw);
+        gap: 5px;
+        width: 128px;
         padding-bottom: 0
     }
 
     .game-scene .hint-note {
         min-width: 0;
         width: 100%;
-        padding: 5px 6px 5px 5px;
-        transform: rotate(-2deg) scale(.9)
+        padding: 6px 8px 6px 7px;
+        transform: rotate(-2deg) scale(.96)
     }
 
     .game-scene .hint-note-neighbor {
-        transform: rotate(1.5deg) scale(.9)
+        transform: rotate(1.5deg) scale(.96)
     }
 
     .game-scene .hint-note:hover:not(:disabled) {
-        transform: rotate(0)translateY(-2px) scale(.92)
+        transform: rotate(0)translateY(-2px) scale(.98)
     }
 
     .game-scene .hint-note-emoji {
-        font-size: 16px
+        font-size: 15px
+    }
+
+    .game-scene .hint-note-title {
+        font-size: 14px !important;
+        opacity: 1
+    }
+
+    .game-scene .hint-note-count {
+        font-size: 18px !important
     }
 
     .game-scene .notebook-desk {
-        width: 92vw;
-        max-width: none;
-        margin-left: auto;
-        margin-right: auto;
+        position: absolute;
+        right: 12px;
+        bottom: 82px;
+        width: clamp(300px, 81vw, 360px);
+        max-width: min(360px, calc(100vw - 16px));
+        min-width: min(300px, calc(100vw - 16px));
+        height: auto;
+        margin: 0;
         left: auto;
-        right: auto;
         flex: 0 0 auto;
-        align-self: center;
+        align-self: auto;
         transform: none !important;
         animation: none !important
     }
 
     .game-scene .notebook-stack {
-        transform: perspective(800px)rotateX(5deg);
-        transform-origin: bottom center
+        transform: perspective(720px)rotateX(4deg);
+        transform-origin: bottom right
     }
 
     .game-scene .notebook-ballpen {
-        right: 2px
+        right: 0
     }
 
     .game-scene .sheet-paper {
-        min-height: min(300px, 44vh);
-        width: 100%
+        min-height: 0;
+        height: auto;
+        max-height: min(230px, 34vh);
+        width: 100%;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch
     }
 
     .game-scene .sheet-content {
-        padding: 14px 12px 16px 34px
+        padding: 12px 10px 14px 32px
     }
 
     .game-scene .sheet-margin-red {
-        left: 28px
+        left: 26px
     }
 
     .game-scene .cw-question,
@@ -7799,15 +7821,6 @@ body {
         font-size: 19px !important
     }
 
-    .game-scene .hint-note-title {
-        font-size: 14px !important;
-        opacity: 1
-    }
-
-    .game-scene .hint-note-count {
-        font-size: 22px !important
-    }
-
     .hud-stats-row {
         gap: 4px;
         max-width: calc(100% - 52px)
@@ -7850,8 +7863,14 @@ body {
 
 @media (max-width: 600px) and (height <= 700px) {
     .game-scene .notebook-desk {
+        bottom: 76px;
+        right: 10px;
         transform: none !important;
         animation: none !important
+    }
+
+    .game-scene .hint-notes {
+        bottom: calc(76px + min(190px, 32vh) + 12px)
     }
 
     .game-scene .cw-question {
@@ -7866,6 +7885,6 @@ body {
     }
 
     .game-scene .sheet-paper {
-        min-height: min(280px, 42vh)
+        max-height: min(210px, 32vh)
     }
 }
