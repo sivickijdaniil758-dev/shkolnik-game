@@ -42,8 +42,7 @@ body {
 }
 
 #root {
-    min-height: 100dvh;
-    overflow-x: hidden
+    min-height: 100dvh
 }
 
 .app-bg {
@@ -7659,22 +7658,14 @@ body {
         font-size: 20px
     }
 
-    /* —— Игровой экран: устойчивая mobile-композиция (≤600px) —— */
-    html, body, #root {
-        overflow-x: hidden
-    }
-
+    /* —— Игровой экран (≤600px) —— */
     .game-scene {
-        height: 100dvh;
-        max-height: 100svh;
         overflow: hidden
     }
 
-    .game-scene-ui {
-        height: 100dvh;
-        max-height: 100svh;
+    .game-scene .game-scene-ui {
         padding: max(38px, calc(env(safe-area-inset-top, 0px) + 32px)) 0 0;
-        overflow: hidden
+        overflow-x: hidden
     }
 
     .game-scene-photo .classroom-photo-img {
@@ -7700,13 +7691,13 @@ body {
 
     .game-scene .hint-notes {
         position: absolute;
-        left: max(3px, env(safe-area-inset-left, 0px));
-        top: 53%;
+        left: max(2px, env(safe-area-inset-left, 0px));
+        top: 51%;
         bottom: auto;
         z-index: 12;
         flex-shrink: 0;
         gap: 3px;
-        width: 98px;
+        width: 110px;
         padding-bottom: 0;
         transform: scale(.9);
         transform-origin: left top
@@ -7714,7 +7705,7 @@ body {
 
     .game-scene .hint-note {
         min-width: 0;
-        max-width: 98px;
+        max-width: 110px;
         width: 100%;
         padding: 4px 5px 4px 4px;
         gap: 4px;
@@ -7738,21 +7729,21 @@ body {
     }
 
     .game-scene .hint-note-title {
-        font-size: 12px !important;
+        font-size: 13px !important;
         line-height: 1.12;
         opacity: 1
     }
 
     .game-scene .hint-note-count {
-        font-size: 18px !important
+        font-size: 20px !important
     }
 
     .game-scene .notebook-desk {
         position: absolute;
         right: 10px;
-        bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 50px));
-        width: clamp(280px, 78vw, 340px);
-        max-width: min(340px, calc(100vw - 24px));
+        bottom: max(62px, calc(env(safe-area-inset-bottom, 0px) + 54px));
+        width: clamp(300px, 80vw, 350px);
+        max-width: min(360px, calc(100vw - 24px));
         height: auto;
         margin: 0;
         left: auto;
@@ -7772,7 +7763,7 @@ body {
     }
 
     .game-scene .sheet-paper {
-        min-height: min(272px, 40vh) !important;
+        min-height: 0 !important;
         height: auto;
         max-height: none;
         width: 100%;
@@ -7780,7 +7771,7 @@ body {
     }
 
     .game-scene .sheet-content {
-        padding: 8px 8px 12px 26px
+        padding: 8px 8px 10px 26px
     }
 
     .game-scene .sheet-margin-red {
@@ -7812,7 +7803,6 @@ body {
         gap: 0
     }
 
-    /* Шрифты: только .game-scene, sans-serif, компактно для 4 ответов без скролла */
     .game-scene .cw-question,
     .game-scene .cw-question *,
     .game-scene .cw-teacher-note,
@@ -7830,8 +7820,8 @@ body {
     }
 
     .game-scene .cw-question {
-        font-size: clamp(18px, 4.8vw, 21px) !important;
-        line-height: 1.3 !important
+        font-size: clamp(19px, 4.8vw, 20px) !important;
+        line-height: 1.28 !important
     }
 
     .game-scene .cw-teacher-note {
@@ -7842,12 +7832,12 @@ body {
     .game-scene .cw-answer-row {
         min-height: 36px !important;
         padding: 4px 6px 4px 2px !important;
-        font-size: clamp(17px, 4.4vw, 19px) !important;
-        line-height: 1.25 !important
+        font-size: 18px !important;
+        line-height: 1.28 !important
     }
 
     .game-scene .cw-letter {
-        font-size: clamp(17px, 4.4vw, 19px) !important;
+        font-size: 18px !important;
         min-width: 1.4em
     }
 
@@ -7855,98 +7845,62 @@ body {
         font-size: 18px !important
     }
 
-    .hud-stats-row {
+    .game-scene .hud-stats-row {
         gap: 3px;
         max-width: calc(100% - 52px)
     }
 
-    .hud-pill {
+    .game-scene .hud-pill {
         padding: 4px 7px;
         font-size: 12px;
         font-weight: 800
     }
 
-    .hud-pill-subject span:last-child {
+    .game-scene .hud-pill-subject span:last-child {
         max-width: 88px
     }
 
-    .hud-pill-name {
+    .game-scene .hud-pill-name {
         gap: 5px
     }
 
-    .hud-player-photo {
+    .game-scene .hud-player-photo {
         width: 24px;
         height: 24px
     }
 
-    .hud-corner-controls {
+    .game-scene .hud-corner-controls {
         gap: 6px;
         top: 8px;
         right: 8px
     }
 
-    .stat-capsule {
+    .game-scene .stat-capsule {
         padding: 5px 8px;
         font-size: 12px
     }
 
-    .hud-progress-wrap {
+    .game-scene .hud-progress-wrap {
         padding: 6px 8px
-    }
-
-    /* —— Главное меню: композиция ближе к desktop —— */
-    .main-menu {
-        overflow: hidden
-    }
-
-    .main-menu-bg {
-        object-fit: contain;
-        object-position: center bottom;
-        width: 100%;
-        height: auto;
-        max-height: 100%;
-        min-width: 0;
-        min-height: 0;
-        inset: auto 0 0 0
-    }
-
-    .main-menu-chalk {
-        top: auto;
-        bottom: calc(100vw * 682 / 1024 * .36);
-        gap: clamp(2px, .85vh, 7px);
-        width: min(80vw, 360px)
-    }
-
-    .main-menu-chalk-btn {
-        padding: clamp(2px, .65vh, 6px) 4px;
-        font-size: clamp(1.1rem, 5.4vw, 1.75rem)
-    }
-
-    .main-menu-sound {
-        top: max(10px, calc(env(safe-area-inset-top, 0px) + 6px));
-        right: max(10px, calc(env(safe-area-inset-right, 0px) + 6px));
-        width: 40px;
-        height: 40px;
-        font-size: 17px
     }
 }
 
 @media (max-width: 600px) and (height <= 700px) {
     .game-scene .notebook-desk {
-        bottom: max(50px, calc(env(safe-area-inset-bottom, 0px) + 46px));
+        bottom: max(58px, calc(env(safe-area-inset-bottom, 0px) + 50px));
         right: 8px;
         transform: none !important;
         animation: none !important
     }
 
     .game-scene .hint-notes {
-        top: 50%;
+        top: 49%;
         transform: scale(.87);
         transform-origin: left top
     }
 
     .game-scene .sheet-paper {
-        min-height: min(256px, 37vh) !important;
+        min-height: 0 !important;
         max-height: none
     }
 }
