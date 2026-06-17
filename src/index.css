@@ -7659,80 +7659,93 @@ body {
         font-size: 20px
     }
 
-    /* —— Игровой экран: layout (шрифты не трогаем) —— */
+    /* —— Игровой экран: устойчивая mobile-композиция (≤600px) —— */
     html, body, #root {
         overflow-x: hidden
     }
 
+    .game-scene {
+        height: 100dvh;
+        max-height: 100svh;
+        overflow: hidden
+    }
+
     .game-scene-ui {
-        padding: 46px 0 0;
-        overflow-x: hidden
+        height: 100dvh;
+        max-height: 100svh;
+        padding: max(38px, calc(env(safe-area-inset-top, 0px) + 32px)) 0 0;
+        overflow: hidden
     }
 
     .game-scene-photo .classroom-photo-img {
-        object-position: center 36%
+        object-position: center 34%
+    }
+
+    .game-scene .game-hud-minimal {
+        flex-shrink: 0;
+        margin-bottom: 2px;
+        padding: 0 10px
     }
 
     .game-scene .game-play-zone {
         flex: 1;
-        justify-content: flex-end;
-        align-items: stretch;
-        gap: 0;
+        min-height: 0;
+        position: relative;
         width: 100%;
         max-width: 100%;
-        min-height: 0;
         margin: 0;
         padding: 0;
-        position: relative;
         overflow: hidden
     }
 
     .game-scene .hint-notes {
         position: absolute;
-        left: max(8px, env(safe-area-inset-left, 0px));
-        bottom: calc(82px + min(210px, 34vh) + 14px);
+        left: max(6px, env(safe-area-inset-left, 0px));
+        top: 53%;
+        bottom: auto;
         z-index: 12;
         flex-shrink: 0;
-        gap: 5px;
-        width: 128px;
-        padding-bottom: 0
+        gap: 4px;
+        width: 115px;
+        padding-bottom: 0;
+        transform: scale(.9);
+        transform-origin: left top
     }
 
     .game-scene .hint-note {
         min-width: 0;
         width: 100%;
-        padding: 6px 8px 6px 7px;
-        transform: rotate(-2deg) scale(.96)
+        padding: 5px 6px 5px 5px;
+        transform: rotate(-2deg)
     }
 
     .game-scene .hint-note-neighbor {
-        transform: rotate(1.5deg) scale(.96)
+        transform: rotate(1.5deg)
     }
 
     .game-scene .hint-note:hover:not(:disabled) {
-        transform: rotate(0)translateY(-2px) scale(.98)
+        transform: rotate(0)translateY(-2px) scale(1.02)
     }
 
     .game-scene .hint-note-emoji {
-        font-size: 15px
+        font-size: 14px
     }
 
     .game-scene .hint-note-title {
-        font-size: 14px !important;
+        font-size: 13px !important;
         opacity: 1
     }
 
     .game-scene .hint-note-count {
-        font-size: 18px !important
+        font-size: 20px !important
     }
 
     .game-scene .notebook-desk {
         position: absolute;
-        right: 12px;
-        bottom: 82px;
-        width: clamp(300px, 81vw, 360px);
-        max-width: min(360px, calc(100vw - 16px));
-        min-width: min(300px, calc(100vw - 16px));
+        right: 10px;
+        bottom: max(56px, calc(env(safe-area-inset-bottom, 0px) + 50px));
+        width: clamp(320px, 82vw, 370px);
+        max-width: calc(100vw - 24px);
         height: auto;
         margin: 0;
         left: auto;
@@ -7743,7 +7756,7 @@ body {
     }
 
     .game-scene .notebook-stack {
-        transform: perspective(720px)rotateX(4deg);
+        transform: perspective(700px)rotateX(3deg);
         transform-origin: bottom right
     }
 
@@ -7752,20 +7765,19 @@ body {
     }
 
     .game-scene .sheet-paper {
-        min-height: 0;
+        min-height: 0 !important;
         height: auto;
-        max-height: min(230px, 34vh);
+        max-height: none;
         width: 100%;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch
+        overflow: visible
     }
 
     .game-scene .sheet-content {
-        padding: 12px 10px 14px 32px
+        padding: 8px 10px 10px 28px
     }
 
     .game-scene .sheet-margin-red {
-        left: 26px
+        left: 24px
     }
 
     .game-scene .cw-question,
@@ -7779,11 +7791,21 @@ body {
     }
 
     .game-scene .cw-question {
+        margin: 0 0 6px;
         overflow-wrap: break-word;
         word-break: normal
     }
 
-    /* Игровой экран: sans-serif, без cursive/italic (главное меню и сохранения не затрагиваются) */
+    .game-scene .cw-teacher-note {
+        margin: 0 0 5px;
+        padding-left: 3px
+    }
+
+    .game-scene .cw-answers {
+        gap: 0
+    }
+
+    /* Шрифты: только .game-scene, sans-serif, компактно для 4 ответов без скролла */
     .game-scene .cw-question,
     .game-scene .cw-question *,
     .game-scene .cw-teacher-note,
@@ -7801,33 +7823,38 @@ body {
     }
 
     .game-scene .cw-question {
-        font-size: 21px !important;
-        line-height: 1.45 !important
+        font-size: clamp(18px, 4.8vw, 21px) !important;
+        line-height: 1.3 !important
     }
 
     .game-scene .cw-teacher-note {
-        font-size: 17px !important;
-        line-height: 1.45 !important
+        font-size: 14px !important;
+        line-height: 1.25 !important
     }
 
     .game-scene .cw-answer-row {
-        min-height: 44px !important;
-        padding: 10px 8px 10px 2px;
-        font-size: 19px !important;
-        line-height: 1.45 !important
+        min-height: 36px !important;
+        padding: 4px 6px 4px 2px !important;
+        font-size: clamp(17px, 4.4vw, 19px) !important;
+        line-height: 1.25 !important
     }
 
     .game-scene .cw-letter {
-        font-size: 19px !important
+        font-size: clamp(17px, 4.4vw, 19px) !important;
+        min-width: 1.4em
+    }
+
+    .game-scene .cw-pen-mark {
+        font-size: 18px !important
     }
 
     .hud-stats-row {
-        gap: 4px;
+        gap: 3px;
         max-width: calc(100% - 52px)
     }
 
     .hud-pill {
-        padding: 5px 8px;
+        padding: 4px 7px;
         font-size: 12px;
         font-weight: 800
     }
@@ -7857,34 +7884,26 @@ body {
     }
 
     .hud-progress-wrap {
-        padding: 8px 10px
+        padding: 6px 8px
     }
 }
 
 @media (max-width: 600px) and (height <= 700px) {
     .game-scene .notebook-desk {
-        bottom: 76px;
-        right: 10px;
+        bottom: max(50px, calc(env(safe-area-inset-bottom, 0px) + 46px));
+        right: 8px;
         transform: none !important;
         animation: none !important
     }
 
     .game-scene .hint-notes {
-        bottom: calc(76px + min(190px, 32vh) + 12px)
-    }
-
-    .game-scene .cw-question {
-        font-size: 21px !important;
-        line-height: 1.45 !important
-    }
-
-    .game-scene .cw-answer-row {
-        font-size: 19px !important;
-        min-height: 44px !important;
-        line-height: 1.45 !important
+        top: 50%;
+        transform: scale(.88);
+        transform-origin: left top
     }
 
     .game-scene .sheet-paper {
-        max-height: min(210px, 32vh)
+        min-height: 0 !important;
+        max-height: none
     }
 }
