@@ -7893,6 +7893,42 @@ body {
     .hud-progress-wrap {
         padding: 6px 8px
     }
+
+    /* —— Главное меню: композиция ближе к desktop —— */
+    .main-menu {
+        overflow: hidden
+    }
+
+    .main-menu-bg {
+        object-fit: contain;
+        object-position: center bottom;
+        width: 100%;
+        height: auto;
+        max-height: 100%;
+        min-width: 0;
+        min-height: 0;
+        inset: auto 0 0 0
+    }
+
+    .main-menu-chalk {
+        top: auto;
+        bottom: calc(100vw * 682 / 1024 * .36);
+        gap: clamp(2px, .85vh, 7px);
+        width: min(80vw, 360px)
+    }
+
+    .main-menu-chalk-btn {
+        padding: clamp(2px, .65vh, 6px) 4px;
+        font-size: clamp(1.1rem, 5.4vw, 1.75rem)
+    }
+
+    .main-menu-sound {
+        top: max(10px, calc(env(safe-area-inset-top, 0px) + 6px));
+        right: max(10px, calc(env(safe-area-inset-right, 0px) + 6px));
+        width: 40px;
+        height: 40px;
+        font-size: 17px
+    }
 }
 
 @media (max-width: 600px) and (height <= 700px) {
