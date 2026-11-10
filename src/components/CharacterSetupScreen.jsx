@@ -95,25 +95,25 @@ function CharacterSetupScreen({
               <div className="dossier-ink-smudge dossier-ink-smudge-2" aria-hidden="true" />
 
               <div className="dossier-field">
-                <span className="dossier-label dossier-type">Фамилия, имя ученика:</span>
+                <span className="dossier-label dossier-type">Имя персонажа:</span>
                 <div className="dossier-line-wrap">
                   <input
                     type="text"
                     className="dossier-hand-input"
                     value={name}
-                    maxLength={24}
+                    maxLength={16}
                     disabled={busy}
                     autoComplete="off"
                     autoCapitalize="words"
                     spellCheck={false}
-                    placeholder="Например: Иванов Иван"
-                    aria-label="Фамилия, имя ученика"
+                    placeholder="Например: Шурик"
+                    aria-label="Имя игрового персонажа"
                     onChange={(e) => onNameChange(e.target.value)}
                   />
                   <span className="dossier-line-rule" aria-hidden="true" />
                 </div>
                 <p className="dossier-enroll-hint dossier-type">
-                  Заполните личное дело для поступления в школу №1
+                  Используйте вымышленное имя, не вводите настоящее ФИО
                 </p>
               </div>
 

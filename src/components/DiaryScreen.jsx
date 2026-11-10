@@ -6,7 +6,6 @@ import { playPageFlipSound } from '../utils/sounds'
 import {
   DIARY_PAGE_ACHIEVEMENTS,
   DIARY_PAGE_COVER,
-  DIARY_PAGE_DOSSIER,
   DIARY_TOTAL_PAGES,
   admissionDateForGrade,
   computeGradeStats,

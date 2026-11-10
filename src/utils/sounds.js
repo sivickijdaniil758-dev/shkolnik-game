@@ -58,6 +58,10 @@ export function resumeAudio() {
   if (ctx.state === 'suspended') ctx.resume()
 }
 
+export function suspendEffectsAudio() {
+  if (audioContext?.state === 'running') audioContext.suspend()
+}
+
 export function playChalkSound() {
   playTone({ frequency: 180, duration: 0.04, type: 'triangle', volume: 0.03, fade: true })
   playTone({ frequency: 240, duration: 0.05, delay: 0.02, type: 'sine', volume: 0.025 })

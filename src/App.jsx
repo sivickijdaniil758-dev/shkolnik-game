@@ -12,7 +12,7 @@ import AchievementsScreen from './components/AchievementsScreen'
 import CharacterSetupScreen from './components/CharacterSetupScreen'
 import { getDefaultPortraitId, normalizePortraitId } from './data/characterPortraits'
 import SaveSlotsScreen from './components/SaveSlotsScreen'
-import { DEFAULT_ACHIEVEMENT_STATS } from './data/achievements'
+import LegalScreen from './components/LegalScreen'
 import {
   DIFFICULTY_OPTIONS,
   FINAL_TEST_MAX_ATTEMPTS,
@@ -40,6 +40,7 @@ import {
   playPageFlipSound,
   playWrongSound,
   resumeAudio,
+  suspendEffectsAudio,
 } from './utils/sounds'
 import SettingsScreen from './components/SettingsScreen'
 import {
@@ -50,7 +51,8 @@ import {
   createFreshHintState,
   createInitialGameState,
   deleteSlot,
-  getActiveSlot,
+  exportSaveBundle,
+  importSaveBundle,
   loadStartupSave,
   mergeSavedIntoState,
   persistGameState,
@@ -68,7 +70,17 @@ import {
   isMenuMusicScreen,
   stopSchoolMusic,
   resumeMusicContext,
+  pauseAllMusic,
 } from './utils/music'
+import {
+  flushPendingCloudSave,
+  initYandexGames,
+  loadCloudSaveBundle,
+  queueCloudSave,
+  setGameplayActive,
+  showFullscreenAd,
+  signalGameReady,
+} from './platform/yandexGames'
 
 const SCREENS = {
   start: 'start',
@@ -83,6 +95,7 @@ const SCREENS = {
   newSubjectIntro: 'newSubjectIntro',
   achievements: 'achievements',
   saveSlots: 'saveSlots',
+  legal: 'legal',
 }
 
 function getInitialGameState() {
@@ -115,6 +128,8 @@ function App() {
   const [slotSummaries, setSlotSummaries] = useState(() => readAllSlotSummaries())
 
   const answeringRef = useRef(false)
+  const answerSubjectRef = useRef(null)
+  const answerFinalRef = useRef(null)
   const processedSubjectKey = useRef('')
   const processedFinalKey = useRef('')
 
@@ -193,34 +208,47 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const { activeSlot, saved } = loadStartupSave()
-    setSlotSummaries(readAllSlotSummaries())
-    if (!activeSlot || !saved) return
+    let cancelled = false
+    initYandexGames().then(async () => {
+      const cloudBundle = await loadCloudSaveBundle()
+      if (cloudBundle) importSaveBundle(cloudBundle)
+      if (cancelled) return
 
-    try {
-      setGameState((prev) =>
-        mergeSavedIntoState(prev, saved, SCREENS.start, activeSlot),
-      )
-      const draft = characterDraftFromSave(saved)
-      if (draft) setCharacterDraft(draft)
-    } catch {
-      deleteSlot(activeSlot)
+      const { activeSlot, saved } = loadStartupSave()
       setSlotSummaries(readAllSlotSummaries())
+      if (activeSlot && saved) {
+        try {
+          setGameState((prev) =>
+            mergeSavedIntoState(prev, saved, SCREENS.start, activeSlot),
+          )
+          const draft = characterDraftFromSave(saved)
+          if (draft) setCharacterDraft(draft)
+        } catch {
+          deleteSlot(activeSlot)
+          setSlotSummaries(readAllSlotSummaries())
+        }
+      }
+      await signalGameReady()
+    })
+    return () => {
+      cancelled = true
     }
   }, [])
 
+  const currentScreen = gameState.screen
+  const musicEnabled = gameState.musicEnabled
+
   useEffect(() => {
-    const { screen, musicEnabled } = gameState
     stopSchoolMusic()
 
-    if (!musicEnabled || !isMenuMusicScreen(screen)) {
+    if (!musicEnabled || !isMenuMusicScreen(currentScreen)) {
       pauseMenuMusicForGameplay()
       return undefined
     }
 
     resumeMenuMusicForMenuScreens()
     return undefined
-  }, [gameState.screen, gameState.musicEnabled])
+  }, [currentScreen, musicEnabled])
 
   useEffect(() => {
     setMenuMusicVolume(gameState.musicVolume)
@@ -241,14 +269,36 @@ function App() {
   }, [gameState.currentGrade])
 
   useEffect(() => {
-    persistGameState(gameState)
+    if (persistGameState(gameState)) queueCloudSave(exportSaveBundle())
   }, [gameState])
 
   useEffect(() => {
-    if (gameState.screen === SCREENS.start || gameState.screen === SCREENS.saveSlots) {
-      setSlotSummaries(readAllSlotSummaries())
+    const handleVisibility = () => {
+      if (document.hidden) {
+        pauseAllMusic()
+        suspendEffectsAudio()
+        setGameplayActive(false)
+      } else if (gameState.musicEnabled && isMenuMusicScreen(gameState.screen)) {
+        resumeMenuMusicForMenuScreens()
+      }
     }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
+  }, [gameState.musicEnabled, gameState.screen])
+
+  useEffect(() => {
+    const active =
+      !document.hidden &&
+      (gameState.screen === SCREENS.subjectQuiz || gameState.screen === SCREENS.finalQuiz)
+    setGameplayActive(active)
+    return () => setGameplayActive(false)
   }, [gameState.screen])
+
+  useEffect(() => {
+    const flush = () => flushPendingCloudSave()
+    window.addEventListener('pagehide', flush)
+    return () => window.removeEventListener('pagehide', flush)
+  }, [])
 
   const upsertDiarySubject = (diary, grade, subjectData) => {
     const nextDiary = [...diary]
@@ -283,26 +333,14 @@ function App() {
   }
 
   useEffect(() => {
-    if (gameState.screen !== SCREENS.subjectQuiz || gameState.selectedOption || answeringRef.current) return
-    const timerId = window.setTimeout(() => {
-      if (gameState.timer <= 1) answerSubjectQuestion(-1, true)
-      else setGameState((prev) => ({ ...prev, timer: prev.timer - 1 }))
-    }, 1000)
-    return () => window.clearTimeout(timerId)
-  }, [gameState.screen, gameState.timer, gameState.selectedOption])
-
-  useEffect(() => {
-    if (gameState.screen !== SCREENS.finalQuiz || gameState.finalSelectedOption || answeringRef.current) return
-    const timerId = window.setTimeout(() => {
-      if (gameState.finalTimer <= 1) answerFinalQuestion(-1, true)
-      else setGameState((prev) => ({ ...prev, finalTimer: prev.finalTimer - 1 }))
-    }, 1000)
-    return () => window.clearTimeout(timerId)
-  }, [gameState.screen, gameState.finalTimer, gameState.finalSelectedOption])
-
-  useEffect(() => {
     const id = window.setInterval(() => {
       setGameState((prev) => {
+        if (
+          document.hidden ||
+          (prev.screen !== SCREENS.subjectQuiz && prev.screen !== SCREENS.finalQuiz)
+        ) {
+          return prev
+        }
         const achievementStats = mergeAchievementStats(prev.achievementStats)
         achievementStats.playTimeMs += 1000
         const checks = collectAchievementChecks(
@@ -885,6 +923,41 @@ function App() {
     }, revealMs)
   }
 
+  useEffect(() => {
+    answerSubjectRef.current = answerSubjectQuestion
+    answerFinalRef.current = answerFinalQuestion
+  })
+
+  useEffect(() => {
+    if (
+      document.hidden ||
+      gameState.screen !== SCREENS.subjectQuiz ||
+      gameState.selectedOption ||
+      answeringRef.current
+    ) return undefined
+    const timerId = window.setTimeout(() => {
+      if (document.hidden) return
+      if (gameState.timer <= 1) answerSubjectRef.current?.(-1, true)
+      else setGameState((prev) => ({ ...prev, timer: prev.timer - 1 }))
+    }, 1000)
+    return () => window.clearTimeout(timerId)
+  }, [gameState.screen, gameState.timer, gameState.selectedOption])
+
+  useEffect(() => {
+    if (
+      document.hidden ||
+      gameState.screen !== SCREENS.finalQuiz ||
+      gameState.finalSelectedOption ||
+      answeringRef.current
+    ) return undefined
+    const timerId = window.setTimeout(() => {
+      if (document.hidden) return
+      if (gameState.finalTimer <= 1) answerFinalRef.current?.(-1, true)
+      else setGameState((prev) => ({ ...prev, finalTimer: prev.finalTimer - 1 }))
+    }, 1000)
+    return () => window.clearTimeout(timerId)
+  }, [gameState.screen, gameState.finalTimer, gameState.finalSelectedOption])
+
   const retryFinal = () => {
     setGameState((prev) => ({
       ...prev,
@@ -900,7 +973,14 @@ function App() {
     }))
   }
 
-  const goToGradeTransition = () => {
+  const goToGradeTransition = async () => {
+    await showFullscreenAd({
+      onOpen: () => {
+        pauseAllMusic()
+        suspendEffectsAudio()
+        setGameplayActive(false)
+      },
+    })
     const nextGrade =
       gameState.currentGrade >= MAX_GRADE
         ? MAX_GRADE + 1
@@ -1039,13 +1119,10 @@ function App() {
     gameState.screen === SCREENS.subjectResult ||
     gameState.screen === SCREENS.finalResult
 
-  const canContinueActiveSlot = useMemo(
-    () => canContinueSlot(resolveContinueSlot(gameState)),
-    [gameState.activeSaveSlot, slotSummaries],
-  )
+  const canContinueActiveSlot = canContinueSlot(resolveContinueSlot(gameState))
 
   return (
-    <div className="app-bg">
+    <div className="app-bg" onContextMenu={(event) => event.preventDefault()}>
       {gameState.screen === SCREENS.start ? (
         <StartScreen
           hasProgress={canContinueActiveSlot}
@@ -1056,9 +1133,18 @@ function App() {
           onOpenDiary={() => openDiary(SCREENS.start)}
           onOpenSettings={openSettings}
           onOpenAchievements={openAchievements}
+          onOpenLegal={() =>
+            setGameState((prev) => ({ ...prev, screen: SCREENS.legal }))
+          }
           onSecretBell={() => bumpSecretStat('bellClicks')}
           onSecretPlane={() => bumpSecretStat('planeClicks')}
           onSecretBackpack={() => bumpSecretStat('backpackClicks')}
+        />
+      ) : null}
+
+      {gameState.screen === SCREENS.legal ? (
+        <LegalScreen
+          onBack={() => setGameState((prev) => ({ ...prev, screen: SCREENS.start }))}
         />
       ) : null}
 

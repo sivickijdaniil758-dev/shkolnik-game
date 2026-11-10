@@ -126,6 +126,41 @@ export function readAllSlotSummaries() {
   return summaries
 }
 
+export function exportSaveBundle() {
+  const slots = {}
+  for (let slot = 1; slot <= SLOT_COUNT; slot += 1) {
+    const data = readSlot(slot)
+    if (data?.hasProgress) slots[slot] = data
+  }
+  return {
+    version: 1,
+    updatedAt: new Date().toISOString(),
+    activeSlot: getActiveSlot(),
+    slots,
+  }
+}
+
+/** Merge cloud data per slot without overwriting a newer local session. */
+export function importSaveBundle(bundle) {
+  if (!bundle || bundle.version !== 1 || typeof bundle.slots !== 'object') return false
+  let changed = false
+
+  for (let slot = 1; slot <= SLOT_COUNT; slot += 1) {
+    const remote = bundle.slots[slot]
+    if (!remote?.hasProgress) continue
+    const local = readSlot(slot)
+    const remoteTime = Date.parse(remote.lastPlayedAt || 0)
+    const localTime = Date.parse(local?.lastPlayedAt || 0)
+    if (!local?.hasProgress || remoteTime > localTime) {
+      writeSlot(slot, remote)
+      changed = true
+    }
+  }
+
+  if (!getActiveSlot() && bundle.activeSlot) setActiveSlot(bundle.activeSlot)
+  return changed
+}
+
 /** Перенос одиночного сохранения v1–v3 в слот 1 */
 export function migrateLegacySave() {
   for (let slot = 1; slot <= SLOT_COUNT; slot += 1) {

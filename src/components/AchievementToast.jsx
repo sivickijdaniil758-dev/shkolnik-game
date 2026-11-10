@@ -9,7 +9,10 @@ function AchievementToast({ achievementId, soundEnabled, onDone }) {
   const achievement = ACHIEVEMENTS[achievementId]
   const [phase, setPhase] = useState('enter')
   const onDoneRef = useRef(onDone)
-  onDoneRef.current = onDone
+
+  useEffect(() => {
+    onDoneRef.current = onDone
+  }, [onDone])
 
   useEffect(() => {
     if (!soundEnabled) return

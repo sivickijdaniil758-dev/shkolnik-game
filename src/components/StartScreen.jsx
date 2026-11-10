@@ -19,6 +19,7 @@ function StartScreen({
   onOpenSettings,
   onOpenDiary,
   onOpenAchievements,
+  onOpenLegal,
   onSecretBell,
   onSecretPlane,
   onSecretBackpack,
@@ -105,6 +106,9 @@ function StartScreen({
         aria-label="Рюкзак"
         onClick={() => handleSecret(onSecretBackpack)}
       />
+      <button type="button" className="main-menu-legal" onClick={onOpenLegal}>
+        Правовая информация
+      </button>
     </div>
   )
 }

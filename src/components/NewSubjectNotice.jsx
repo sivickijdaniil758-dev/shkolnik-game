@@ -61,7 +61,7 @@ function NewSubjectNotice({
     )
 
     return () => timers.forEach((id) => window.clearTimeout(id))
-  }, [skipAnimation, soundEnabled, onAnimated])
+  }, [grade, subject, skipAnimation, soundEnabled, onAnimated])
 
   return (
     <div className="new-subject-scene">

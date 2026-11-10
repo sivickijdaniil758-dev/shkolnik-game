@@ -32,6 +32,16 @@
     -webkit-tap-highlight-color: transparent
 }
 
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid #ffe066;
+    outline-offset: 3px
+}
+
+button {
+    touch-action: manipulation
+}
+
 body {
     min-height: 100dvh;
     font-family: var(--font-game);
@@ -53,6 +63,70 @@ body {
     margin: 0 auto;
     position: relative;
     overflow: hidden
+}
+
+.main-menu-legal {
+    position: absolute;
+    z-index: 20;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(10px, env(safe-area-inset-bottom));
+    color: #fff;
+    background: #111a;
+    border: 1px solid #fff6;
+    border-radius: 999px;
+    padding: 8px 12px;
+    font: 700 12px/1.2 var(--font-game);
+    cursor: pointer
+}
+
+.legal-screen {
+    min-height: 100dvh;
+    overflow: auto;
+    padding: max(24px, env(safe-area-inset-top)) 16px max(24px, env(safe-area-inset-bottom));
+    background: radial-gradient(circle at top, #45688b, #162537 72%)
+}
+
+.legal-card {
+    width: min(100%, 720px);
+    margin: 0 auto;
+    padding: clamp(22px, 5vw, 40px);
+    color: #202b39;
+    background: #fffaf0;
+    border-radius: 20px;
+    box-shadow: 0 20px 70px #0006
+}
+
+.legal-card h1,
+.legal-card h2 {
+    margin: 0 0 10px
+}
+
+.legal-card h2 {
+    margin-top: 24px;
+    font-size: 18px
+}
+
+.legal-card p {
+    line-height: 1.6
+}
+
+.legal-kicker {
+    color: #546b83;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    font-size: 12px;
+    font-weight: 900
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important
+    }
 }
 
 .classroom-scene {
@@ -7691,22 +7765,23 @@ body {
 
     .game-scene .hint-notes {
         position: absolute;
-        left: max(2px, env(safe-area-inset-left, 0px));
-        top: 51%;
+        left: 50%;
+        top: clamp(116px, 27%, 168px);
         bottom: auto;
         z-index: 12;
+        flex-direction: row;
         flex-shrink: 0;
         gap: 3px;
-        width: 110px;
+        width: auto;
         padding-bottom: 0;
-        transform: scale(.9);
-        transform-origin: left top
+        transform: translateX(-50%) scale(.82);
+        transform-origin: center top
     }
 
     .game-scene .hint-note {
         min-width: 0;
         max-width: 110px;
-        width: 100%;
+        width: 110px;
         padding: 4px 5px 4px 4px;
         gap: 4px;
         transform: rotate(-2deg)
@@ -7717,7 +7792,7 @@ body {
     }
 
     .game-scene .hint-note:hover:not(:disabled) {
-        transform: rotate(0)translateY(-2px) scale(1.02)
+        transform: rotate(0)translateY(-2px)
     }
 
     .game-scene .hint-note-body {
@@ -7894,9 +7969,9 @@ body {
     }
 
     .game-scene .hint-notes {
-        top: 49%;
-        transform: scale(.87);
-        transform-origin: left top
+        top: clamp(108px, 26%, 145px);
+        transform: translateX(-50%) scale(.78);
+        transform-origin: center top
     }
 
     .game-scene .sheet-paper {

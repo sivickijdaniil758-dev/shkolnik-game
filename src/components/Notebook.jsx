@@ -42,7 +42,7 @@ function Notebook({
                 <p className="cw-teacher-note">{teacherPhrase}</p>
               ) : null}
 
-              <div className="cw-answers" role="list">
+              <div className="cw-answers" aria-label="Варианты ответа">
                 {question.options.map((option, index) => {
                   if (hiddenOptionIndices.includes(index)) return null
                   const state = getAnswerRowState(index, question, selectedOption, highlightCorrect)
@@ -52,7 +52,6 @@ function Notebook({
                     <button
                       key={`${option}-${index}`}
                       type="button"
-                      role="listitem"
                       className={`cw-answer-row answer-${state}`}
                       onClick={() => onAnswer(index)}
                       disabled={Boolean(selectedOption)}

@@ -1,6 +1,5 @@
 import { ACHIEVEMENTS, ACHIEVEMENT_IDS, DEFAULT_ACHIEVEMENT_STATS } from '../data/achievements'
 import { getGradeSubjects } from '../data/grades'
-import { MAX_GRADE } from '../data/questions'
 
 export function mergeAchievementStats(stats) {
   return { ...DEFAULT_ACHIEVEMENT_STATS, ...stats }

@@ -3,41 +3,31 @@ import AchievementToast from './AchievementToast'
 
 const MAX_VISIBLE = 2
 
-function AchievementToasts({ queue, soundEnabled, screen, onQueueConsumed }) {
+function AchievementToasts({ queue, soundEnabled, onQueueConsumed }) {
   const [slots, setSlots] = useState([])
   const shownIdsRef = useRef(new Set())
-  const onQueueConsumedRef = useRef(onQueueConsumed)
-  onQueueConsumedRef.current = onQueueConsumed
-
-  useEffect(() => {
-    setSlots([])
-  }, [screen])
 
   useEffect(() => {
     if (!queue.length) return
+    const room = MAX_VISIBLE - slots.length
+    if (room <= 0) return
 
-    setSlots((prev) => {
-      const room = MAX_VISIBLE - prev.length
-      if (room <= 0) return prev
+    const activeIds = new Set(slots.map((slot) => slot.id))
+    const nextIds = queue
+      .filter((id) => !activeIds.has(id) && !shownIdsRef.current.has(id))
+      .slice(0, room)
+    if (!nextIds.length) return
 
-      const activeIds = new Set(prev.map((s) => s.id))
-      const nextIds = queue
-        .filter((id) => !activeIds.has(id) && !shownIdsRef.current.has(id))
-        .slice(0, room)
-
-      if (!nextIds.length) return prev
-
-      nextIds.forEach((id) => shownIdsRef.current.add(id))
-      onQueueConsumedRef.current(nextIds)
-
-      const newSlots = nextIds.map((id) => ({
+    nextIds.forEach((id) => shownIdsRef.current.add(id))
+    setSlots((prev) => [
+      ...prev,
+      ...nextIds.map((id) => ({
         id,
         key: `${id}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      }))
-
-      return [...prev, ...newSlots]
-    })
-  }, [queue, slots.length])
+      })),
+    ])
+    onQueueConsumed(nextIds)
+  }, [queue, slots, onQueueConsumed])
 
   const handleDone = useCallback((key) => {
     setSlots((prev) => prev.filter((s) => s.key !== key))

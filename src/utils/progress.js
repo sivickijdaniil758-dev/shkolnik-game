@@ -4,10 +4,8 @@ import { DIFFICULTY_OPTIONS, getGradeSubjects } from '../data/questions'
 import { HINTS_PER_CLASS } from './hintHelpers'
 import { getMenuMusicVolume, readMenuMusicEnabled } from './music'
 import {
-  deleteSlot,
   getActiveSlot,
   migrateLegacySave,
-  readAllSlotSummaries,
   readSlot,
   setActiveSlot,
   writeSlot,
@@ -15,7 +13,9 @@ import {
 
 export {
   deleteSlot,
+  exportSaveBundle,
   getActiveSlot,
+  importSaveBundle,
   migrateLegacySave,
   readAllSlotSummaries,
   readSlot,
@@ -112,20 +112,20 @@ export function createInitialGameState({
 
 /** Поля, которые не пишутся в localStorage */
 export function pickPersistedState(state) {
-  const {
-    menuOpen: _menuOpen,
-    settingsOpen: _settingsOpen,
-    pendingNextGrade: _pendingNextGrade,
-    pendingNewSubjects: _pendingNewSubjects,
-    pendingNewSubjectIndex: _pendingNewSubjectIndex,
-    returnScreen: _returnScreen,
-    selectedOption: _selectedOption,
-    finalSelectedOption: _finalSelectedOption,
-    lastSubjectResult: _lastSubjectResult,
-    lastFinalResult: _lastFinalResult,
-    activeSaveSlot: _activeSaveSlot,
-    ...persisted
-  } = state
+  const persisted = { ...state }
+  ;[
+    'menuOpen',
+    'settingsOpen',
+    'pendingNextGrade',
+    'pendingNewSubjects',
+    'pendingNewSubjectIndex',
+    'returnScreen',
+    'selectedOption',
+    'finalSelectedOption',
+    'lastSubjectResult',
+    'lastFinalResult',
+    'activeSaveSlot',
+  ].forEach((key) => delete persisted[key])
   return persisted
 }
 

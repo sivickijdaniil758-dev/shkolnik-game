@@ -110,6 +110,11 @@ export function pauseMenuMusicForGameplay() {
   getMenuAudio().pause()
 }
 
+export function pauseAllMusic() {
+  getMenuAudio().pause()
+  if (audioContext?.state === 'running') audioContext.suspend()
+}
+
 /** @deprecated используйте pauseMenuMusicForGameplay */
 export function stopMenuMusicOnlyForGameplay() {
   pauseMenuMusicForGameplay()
