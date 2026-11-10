@@ -67,7 +67,7 @@ function getMenuAudio() {
   if (!menuAudio) {
     menuAudio = new Audio(menuThemeUrl)
     menuAudio.loop = true
-    menuAudio.preload = 'auto'
+    menuAudio.preload = 'metadata'
     menuAudio.volume = 0
   }
   return menuAudio
