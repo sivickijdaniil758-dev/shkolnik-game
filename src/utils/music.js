@@ -2,7 +2,7 @@ import menuThemeUrl from '../assets/audio/menu-theme.mp3'
 
 /** Фоновая музыка меню — HTML Audio API, один экземпляр на всю сессию */
 
-const MENU_START_SEC = 3
+const MENU_START_SEC = 0
 const DEFAULT_VOLUME_PERCENT = 20
 const SOUND_MUTE_STORAGE_KEY = 'schoolboy-menu-music-enabled'
 const VOLUME_STORAGE_KEY = 'schoolboy-menu-music-volume'
