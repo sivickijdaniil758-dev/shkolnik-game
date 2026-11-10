@@ -1,5 +1,5 @@
-import { useCallback, useRef } from 'react'
-import { getPortraitsForGender } from '../data/characterPortraits'
+import { useCallback, useEffect, useRef } from 'react'
+import { getPortraitsForGender, preloadPortraits } from '../data/characterPortraits'
 
 function DossierStudentPhoto({ gender, portraitId, onPortraitChange, disabled = false }) {
   const portraits = getPortraitsForGender(gender)
@@ -9,6 +9,8 @@ function DossierStudentPhoto({ gender, portraitId, onPortraitChange, disabled = 
   )
   const current = portraits[index] ?? portraits[0]
   const touchStartX = useRef(null)
+
+  useEffect(() => { preloadPortraits() }, [])
 
   const go = useCallback(
     (delta) => {
@@ -43,10 +45,13 @@ function DossierStudentPhoto({ gender, portraitId, onPortraitChange, disabled = 
         <span className="dossier-photo-clip" aria-hidden="true" />
         <div className="dossier-photo-frame">
           <img
-            key={current.id}
             className="dossier-photo-img"
             src={current.image}
-            alt=""
+            alt={current.label}
+            width={384}
+            height={480}
+            loading="eager"
+            fetchPriority="high"
             draggable={false}
             decoding="async"
           />

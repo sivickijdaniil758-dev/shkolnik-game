@@ -10,7 +10,7 @@ import InGameMenu from './components/InGameMenu'
 import AchievementToasts from './components/AchievementToasts'
 import AchievementsScreen from './components/AchievementsScreen'
 import CharacterSetupScreen from './components/CharacterSetupScreen'
-import { getDefaultPortraitId, normalizePortraitId } from './data/characterPortraits'
+import { getDefaultPortraitId, normalizePortraitId, preloadPortraits } from './data/characterPortraits'
 import SaveSlotsScreen from './components/SaveSlotsScreen'
 import LegalScreen from './components/LegalScreen'
 import {
@@ -436,6 +436,7 @@ function App() {
   }
 
   const openSaveSlots = () => {
+    preloadPortraits()
     setSlotSummaries(readAllSlotSummaries())
     setGameState((prev) => ({
       ...prev,

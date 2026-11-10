@@ -1,9 +1,9 @@
-import boySportsman from '../assets/portraits/boy-sportsman.png'
-import boyBotanist from '../assets/portraits/boy-botanist.png'
-import boyNeformal from '../assets/portraits/boy-neformal.png'
-import girlExcellent from '../assets/portraits/girl-excellent.png'
-import girlQueen from '../assets/portraits/girl-queen.png'
-import girlEmo from '../assets/portraits/girl-emo.png'
+import boySportsman from '../assets/portraits/boy-sportsman.webp'
+import boyBotanist from '../assets/portraits/boy-botanist.webp'
+import boyNeformal from '../assets/portraits/boy-neformal.webp'
+import girlExcellent from '../assets/portraits/girl-excellent.webp'
+import girlQueen from '../assets/portraits/girl-queen.webp'
+import girlEmo from '../assets/portraits/girl-emo.webp'
 
 export const PORTRAIT_GROUPS = {
   boy: [
@@ -42,4 +42,20 @@ export function getPortraitById(portraitId) {
 
 export function getPortraitImage(portraitId) {
   return getPortraitById(portraitId).image
+}
+
+const warmedPortraits = new Map()
+
+/** Start while the player chooses a save slot; reuse the normal browser cache. */
+export function preloadPortraits() {
+  for (const portrait of Object.values(PORTRAIT_GROUPS).flat()) {
+    if (warmedPortraits.has(portrait.image)) continue
+    const image = new Image()
+    image.decoding = 'async'
+    image.fetchPriority = 'low'
+    image.onerror = () => warmedPortraits.delete(portrait.image)
+    image.src = portrait.image
+    warmedPortraits.set(portrait.image, image)
+    image.decode?.().catch(() => {})
+  }
 }
