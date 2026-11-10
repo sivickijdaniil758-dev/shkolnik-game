@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { normalizePortraitId } from '../data/characterPortraits'
-import { playPageFlipSound, playStampSound, resumeAudio } from '../utils/sounds'
-import DossierDirectorSignature from './DossierDirectorSignature'
+import { playPageFlipSound, resumeAudio } from '../utils/sounds'
+import DocumentStamp from './DocumentStamp'
 import DossierStudentPhoto from './DossierStudentPhoto'
 
 function randomCaseNumber() {
   return String(Math.floor(10000 + Math.random() * 89999))
 }
-
-const SIGN_DURATION_MS = 1050
-const STAMP_DURATION_MS = 700
-const CLOSE_DELAY_MS = 800
 
 function CharacterSetupScreen({
   name,
@@ -21,9 +17,9 @@ function CharacterSetupScreen({
   onPortraitChange,
   onSubmit,
   onBack,
+  soundEnabled = true,
 }) {
   const [phase, setPhase] = useState('enter')
-  const [stampVisible, setStampVisible] = useState(false)
   const caseNumber = useMemo(() => randomCaseNumber(), [])
   const safePortraitId = normalizePortraitId(gender, portraitId)
   const canSubmit = name.trim().length >= 2
@@ -41,23 +37,8 @@ function CharacterSetupScreen({
 
   const handleAccept = () => {
     if (!canSubmit || busy) return
-    resumeAudio()
-    setPhase('signing')
-
-    window.setTimeout(() => {
-      setPhase('stamping')
-      playStampSound()
-      setStampVisible(true)
-    }, SIGN_DURATION_MS)
-
-    window.setTimeout(() => {
-      setPhase('closing')
-    }, SIGN_DURATION_MS + STAMP_DURATION_MS)
-
-    window.setTimeout(() => {
-      playPageFlipSound()
-      onSubmit()
-    }, SIGN_DURATION_MS + STAMP_DURATION_MS + CLOSE_DELAY_MS)
+    if (soundEnabled) resumeAudio()
+    setPhase('stamping')
   }
 
   return (
@@ -147,7 +128,11 @@ function CharacterSetupScreen({
                 После заполнения личного дела ученик будет зачислен в 1-А класс
               </p>
 
-              <DossierDirectorSignature phase={phase} />
+              <DocumentStamp active={busy} soundEnabled={soundEnabled} label="ЗАЧИСЛЕН В 1 КЛАСС"
+                onComplete={() => {
+                  if (soundEnabled) playPageFlipSound()
+                  onSubmit()
+                }} />
             </div>
 
             <DossierStudentPhoto
@@ -157,13 +142,6 @@ function CharacterSetupScreen({
               onPortraitChange={onPortraitChange}
             />
           </div>
-
-          {stampVisible ? (
-            <div className="dossier-stamp-mark" aria-hidden="true">
-              <span className="dossier-stamp-mark-title">ЗАЧИСЛЕН</span>
-              <span className="dossier-stamp-mark-sub">в 1 класс</span>
-            </div>
-          ) : null}
 
           <div className={`dossier-stamp-area ${busy ? 'dossier-stamp-area--busy' : ''}`}>
             {!busy ? (

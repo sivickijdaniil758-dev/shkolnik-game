@@ -1,31 +1,98 @@
 let audioContext = null
+let output = null
+let enabled = true
+const playing = new Set()
+
+function stopEffects() {
+  for (const source of playing) {
+    try { source.stop() } catch { /* Already ended. */ }
+  }
+  playing.clear()
+}
+
+export function setEffectsEnabled(value) {
+  enabled = Boolean(value)
+  if (!enabled) stopEffects()
+}
 
 function getContext() {
   if (!audioContext) {
-    audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    const AudioContext = window.AudioContext || window.webkitAudioContext
+    if (!AudioContext) return null
+    audioContext = new AudioContext()
+    output = audioContext.createDynamicsCompressor()
+    output.threshold.value = -18
+    output.knee.value = 12
+    output.ratio.value = 4
+    output.attack.value = 0.003
+    output.release.value = 0.15
+    output.connect(audioContext.destination)
   }
   return audioContext
 }
 
 function playTone({ frequency, duration = 0.12, type = 'sine', volume = 0.08, delay = 0, fade = true }) {
+  if (!enabled || document.hidden) return
   const ctx = getContext()
+  if (!ctx || ctx.state !== 'running') return
   const oscillator = ctx.createOscillator()
   const gain = ctx.createGain()
   oscillator.type = type
   oscillator.frequency.value = frequency
   gain.gain.value = 0
   oscillator.connect(gain)
-  gain.connect(ctx.destination)
+  gain.connect(output)
   const start = ctx.currentTime + delay
   const end = start + duration
+  gain.gain.setValueAtTime(0, start)
   if (fade) {
     gain.gain.linearRampToValueAtTime(volume, start + 0.02)
     gain.gain.exponentialRampToValueAtTime(0.001, end)
   } else {
-    gain.gain.value = volume
+    gain.gain.linearRampToValueAtTime(volume, start + 0.004)
+    gain.gain.exponentialRampToValueAtTime(0.001, end)
+  }
+  playing.add(oscillator)
+  oscillator.onended = () => {
+    playing.delete(oscillator)
+    oscillator.disconnect()
+    gain.disconnect()
   }
   oscillator.start(start)
   oscillator.stop(end + 0.02)
+}
+
+// Filtered procedural noise gives paper and rubber a texture without sampled assets.
+function playTexture({ duration, frequency, volume, delay = 0 }) {
+  if (!enabled || document.hidden) return
+  const ctx = getContext()
+  if (!ctx || ctx.state !== 'running') return
+  const source = ctx.createBufferSource()
+  const buffer = ctx.createBuffer(1, Math.ceil(ctx.sampleRate * duration), ctx.sampleRate)
+  const samples = buffer.getChannelData(0)
+  for (let i = 0; i < samples.length; i += 1) samples[i] = Math.random() * 2 - 1
+  source.buffer = buffer
+  const filter = ctx.createBiquadFilter()
+  filter.type = 'bandpass'
+  filter.frequency.value = frequency
+  filter.Q.value = 0.65
+  const gain = ctx.createGain()
+  const start = ctx.currentTime + delay
+  gain.gain.setValueAtTime(0, start)
+  gain.gain.linearRampToValueAtTime(volume, start + 0.008)
+  gain.gain.exponentialRampToValueAtTime(0.001, start + duration)
+  source.connect(filter)
+  filter.connect(gain)
+  gain.connect(output)
+  playing.add(source)
+  source.onended = () => {
+    playing.delete(source)
+    source.disconnect()
+    filter.disconnect()
+    gain.disconnect()
+  }
+  source.start(start)
+  source.stop(start + duration)
 }
 
 export function playCorrectSound() {
@@ -43,8 +110,8 @@ export function playNextSound() {
 }
 
 export function playPageFlipSound() {
-  playTone({ frequency: 120, duration: 0.06, type: 'triangle', volume: 0.05 })
-  playTone({ frequency: 90, duration: 0.08, delay: 0.04, type: 'sine', volume: 0.04 })
+  playTexture({ duration: 0.16, frequency: 1900, volume: 0.09 })
+  playTexture({ duration: 0.11, frequency: 1100, volume: 0.05, delay: 0.08 })
 }
 
 export function playFiveSound() {
@@ -54,17 +121,18 @@ export function playFiveSound() {
 }
 
 export function resumeAudio() {
+  if (!enabled || document.hidden) return
   const ctx = getContext()
-  if (ctx.state === 'suspended') ctx.resume()
+  if (ctx?.state === 'suspended') ctx.resume().catch(() => {})
 }
 
 export function suspendEffectsAudio() {
-  if (audioContext?.state === 'running') audioContext.suspend()
+  stopEffects()
+  if (audioContext?.state === 'running') audioContext.suspend().catch(() => {})
 }
 
 export function playChalkSound() {
-  playTone({ frequency: 180, duration: 0.04, type: 'triangle', volume: 0.03, fade: true })
-  playTone({ frequency: 240, duration: 0.05, delay: 0.02, type: 'sine', volume: 0.025 })
+  playTexture({ duration: 0.055, frequency: 2300, volume: 0.055 })
 }
 
 /** Лёгкий звук всплывающего достижения */
@@ -83,9 +151,9 @@ export function playSchoolBellSound() {
 
 /** Удар школьной печати */
 export function playStampSound() {
-  playTone({ frequency: 70, duration: 0.07, type: 'square', volume: 0.11, fade: false })
-  playTone({ frequency: 110, duration: 0.05, delay: 0.03, type: 'triangle', volume: 0.07 })
-  playTone({ frequency: 45, duration: 0.12, delay: 0.02, type: 'sine', volume: 0.09 })
+  playTexture({ duration: 0.075, frequency: 650, volume: 0.18 })
+  playTone({ frequency: 135, duration: 0.09, volume: 0.075, fade: false })
+  playTexture({ duration: 0.05, frequency: 1500, volume: 0.045, delay: 0.065 })
 }
 
 /** Короткий звук ручки по бумаге */

@@ -41,6 +41,7 @@ import {
   playWrongSound,
   resumeAudio,
   suspendEffectsAudio,
+  setEffectsEnabled,
 } from './utils/sounds'
 import SettingsScreen from './components/SettingsScreen'
 import {
@@ -253,6 +254,10 @@ function App() {
   useEffect(() => {
     setMenuMusicVolume(gameState.musicVolume)
   }, [gameState.musicVolume])
+
+  useEffect(() => {
+    setEffectsEnabled(gameState.soundEnabled)
+  }, [gameState.soundEnabled])
 
   useEffect(() => {
     if (!gameState.musicEnabled) return undefined
@@ -1099,6 +1104,7 @@ function App() {
   }
 
   const toggleSound = () => {
+    setEffectsEnabled(!gameState.soundEnabled)
     resumeAudio()
     setGameState((prev) => {
       const soundEnabled = !prev.soundEnabled
@@ -1181,6 +1187,7 @@ function App() {
 
       {gameState.screen === SCREENS.characterSetup ? (
         <CharacterSetupScreen
+          soundEnabled={gameState.soundEnabled}
           name={characterDraft.name}
           gender={characterDraft.gender}
           portraitId={characterDraft.portraitId}
@@ -1293,6 +1300,7 @@ function App() {
       {gameState.screen === SCREENS.newSubjectIntro &&
       gameState.pendingNewSubjects?.length > 0 ? (
         <NewSubjectNotice
+          key={`${gameState.pendingNextGrade}-${gameState.pendingNewSubjectIndex}`}
           subject={gameState.pendingNewSubjects[gameState.pendingNewSubjectIndex ?? 0]}
           grade={gameState.pendingNextGrade}
           soundEnabled={gameState.soundEnabled}

@@ -1,3 +1,10 @@
+import { playStampSound, playPageFlipSound, playCorrectSound, playWrongSound, resumeAudio } from '../utils/sounds'
+
+const SOUND_SAMPLES = [
+  ['Печать', playStampSound], ['Бумага', playPageFlipSound],
+  ['Верный ответ', playCorrectSound], ['Ошибка', playWrongSound],
+]
+
 function SettingsScreen({
   difficulty,
   difficultyOptions,
@@ -51,6 +58,7 @@ function SettingsScreen({
           <button
             type="button"
             className={`journal-sound-row ${soundEnabled ? '' : 'muted'}`}
+            aria-pressed={soundEnabled}
             onClick={onToggleSound}
           >
             <span className={`journal-speaker ${soundEnabled ? '' : 'journal-speaker-off'}`}>
@@ -58,6 +66,15 @@ function SettingsScreen({
             </span>
             <span className="journal-hand">{soundEnabled ? 'Включён' : 'Выключен'}</span>
           </button>
+          <div className="sound-samples" aria-label="Послушать звуки игры">
+            {SOUND_SAMPLES.map(([label, play]) => (
+              <button type="button" key={label} disabled={!soundEnabled} onClick={() => {
+                resumeAudio()
+                play()
+              }}>{label}</button>
+            ))}
+          </div>
+          <p className="sound-samples-note">Нажмите, чтобы послушать. Музыка настраивается отдельно.</p>
         </section>
 
         <section className="journal-section">

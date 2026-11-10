@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS } from '../data/achievements'
+import DocumentStamp from './DocumentStamp'
 import { resolveRewardType } from '../data/rewardTypes'
 import {
   formatGramotaReason,
@@ -62,8 +63,7 @@ function AchievementAward({
 
       <footer className="gramota-foot">
         <div className="gramota-sign-block">
-          <p className="gramota-director">Директор школы №1</p>
-          <p className="gramota-sign-line">_____________________</p>
+          <DocumentStamp complete label="НАГРАЖДЁН" />
           {dateLabel ? <p className="gramota-date">Дата выдачи: {dateLabel}</p> : null}
         </div>
         <div className="gramota-seal" aria-hidden="true">

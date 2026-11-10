@@ -1,11 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
-import PromotionDirectorSignature from './PromotionDirectorSignature'
+import { useEffect, useEffectEvent, useMemo, useState } from 'react'
+import DocumentStamp from './DocumentStamp'
 import { parseStudentName } from '../utils/diaryHelpers'
-import { playPageFlipSound, playPenOnPaperSound, playStampSound, resumeAudio } from '../utils/sounds'
-
-const INITIAL_DELAY_MS = 700
-const SIGN_DURATION_MS = 1000
-const STAMP_DELAY_MS = 500
+import { playPageFlipSound } from '../utils/sounds'
 
 function schoolYearLabel(grade) {
   const start = 2003 + grade
@@ -38,7 +34,6 @@ function GradeTransitionScreen({
   onContinue,
 }) {
   const [phase, setPhase] = useState(skipAnimation ? 'stamped' : 'enter')
-  const [stampVisible, setStampVisible] = useState(skipAnimation)
   const { surname, firstName } = useMemo(() => parseStudentName(playerName), [playerName])
 
   const subjects = gradeRecord?.subjects ?? []
@@ -46,57 +41,23 @@ function GradeTransitionScreen({
   const averageMark = gradeRecord?.averageMark
   const hasGrades = subjects.length > 0
 
-  const signing = phase === 'signing'
-  const signed = phase === 'signed' || phase === 'stamped'
-
+  const finishClosing = useEffectEvent(() => onContinue())
   useEffect(() => {
-    if (skipAnimation) return undefined
-
-    const timers = []
-
-    timers.push(
-      window.setTimeout(() => {
-        if (soundEnabled) {
-          resumeAudio()
-          playPenOnPaperSound()
-        }
-        setPhase('signing')
-      }, INITIAL_DELAY_MS),
-    )
-
-    timers.push(
-      window.setTimeout(() => {
-        setPhase('signed')
-      }, INITIAL_DELAY_MS + SIGN_DURATION_MS),
-    )
-
-    timers.push(
-      window.setTimeout(() => {
-        if (soundEnabled) {
-          resumeAudio()
-          playStampSound()
-        }
-        setStampVisible(true)
-        setPhase('stamped')
-        onAnimated?.(fromGrade)
-      }, INITIAL_DELAY_MS + SIGN_DURATION_MS + STAMP_DELAY_MS),
-    )
-
-    return () => timers.forEach((id) => window.clearTimeout(id))
-  }, [skipAnimation, soundEnabled, fromGrade, onAnimated])
+    if (phase !== 'closing') return undefined
+    const timer = window.setTimeout(finishClosing, 350)
+    return () => window.clearTimeout(timer)
+  }, [phase])
 
   const handleContinue = () => {
-    if (phase === 'closing') return
+    if (phase !== 'stamped') return
     if (soundEnabled) {
-      resumeAudio()
       playPageFlipSound()
     }
     setPhase('closing')
-    window.setTimeout(onContinue, 520)
   }
 
   const stampLines =
-    toGrade >= 11
+    toGrade > 11
       ? ['ВЫПУСК', 'ОКОНЧЕН']
       : ['ПЕРЕВЕДЁН', `В ${toGrade} КЛАСС`]
 
@@ -143,7 +104,7 @@ function GradeTransitionScreen({
             <p className="promotion-line promotion-type promotion-line-1">Учебный год завершён</p>
             <p className="promotion-line promotion-hand promotion-line-2">Поздравляем!</p>
             <p className="promotion-line promotion-type promotion-line-3">
-              {toGrade >= 11 ? (
+              {toGrade > 11 ? (
                 <>Вы успешно завершили <strong>{fromGrade} класс</strong></>
               ) : (
                 <>
@@ -201,30 +162,24 @@ function GradeTransitionScreen({
 
           <footer className="promotion-footer">
             <div className="promotion-signature">
-              <p className="promotion-type">Директор школы</p>
-              <PromotionDirectorSignature signing={signing} signed={signed} />
-              <p className="promotion-sign-caption promotion-type">/ Сидорова Л.И. /</p>
+              <DocumentStamp complete={skipAnimation} soundEnabled={soundEnabled}
+                label={stampLines.join(' ')} onComplete={() => {
+                  setPhase('stamped')
+                  onAnimated?.(fromGrade)
+                }} />
               <p className="promotion-date promotion-type">«31» мая {2004 + fromGrade} г.</p>
             </div>
           </footer>
 
-          {stampVisible ? (
-            <div className="promotion-stamp" aria-hidden="true">
-              <div className="promotion-stamp-ring">
-                <span className="promotion-stamp-line">{stampLines[0]}</span>
-                <span className="promotion-stamp-line">{stampLines[1]}</span>
-              </div>
-            </div>
-          ) : null}
         </article>
 
         <button
           type="button"
           className="promotion-start-btn"
           onClick={handleContinue}
-          disabled={phase === 'closing'}
+          disabled={phase !== 'stamped'}
         >
-          {toGrade >= 11 ? 'Завершить учебный год' : `Начать ${toGrade} класс`}
+          {phase === 'enter' ? 'Ставим печать…' : toGrade > 11 ? 'Завершить учебный год' : `Начать ${toGrade} класс`}
         </button>
       </div>
     </div>

@@ -1,0 +1,22 @@
+.document-stamp { position: relative; display: grid; place-items: center; width: min(100%, 280px); min-height: 114px; margin: 14px 0; isolation: isolate; }
+.document-stamp-placeholder { color: #65707b; border: 1px dashed #65707b80; border-radius: 6px; padding: 26px 12px; width: 100%; text-align: center; font: 14px/1.4 system-ui, sans-serif; }
+.document-stamp-ink { width: 100%; padding: 10px 8px; color: #234d83; border: 3px double currentColor; border-radius: 7px; text-align: center; transform: rotate(-3deg); background: #e3edff22; font-family: system-ui, sans-serif; animation: document-ink-settle 260ms ease-out both; }
+.document-stamp-ink strong { display: block; font-size: clamp(13px, 3.8vw, 17px); line-height: 1.4; overflow-wrap: anywhere; }
+.document-stamp-label { display: block; font-size: 12px; font-weight: 800; letter-spacing: .09em; padding-bottom: 5px; }
+.document-stamp-role { display: block; border-top: 1px solid #234d8360; margin-top: 5px; padding-top: 4px; font-size: 10px; }
+.document-stamp-tool { position: absolute; z-index: 2; width: 145px; height: 92px; left: calc(50% - 72px); top: 0; transform-origin: center bottom; animation: document-stamp-press var(--stamp-impact) cubic-bezier(.55, 0, .9, .55) both; pointer-events: none; }
+.document-stamp-tool i { position: absolute; left: 52px; top: 0; width: 40px; height: 65px; border-radius: 16px 16px 5px 5px; background: linear-gradient(90deg, #3a2218, #8f5b36 45%, #482b20); box-shadow: inset 2px 1px 0 #ffffff30; }
+.document-stamp-tool b { position: absolute; bottom: 0; width: 145px; height: 28px; border-radius: 7px; background: linear-gradient(#535b69, #252d39); border-bottom: 7px solid #131923; box-shadow: 0 12px 18px #15203335; }
+.document-stamp-ink--static { animation: none; }
+@keyframes document-stamp-press { from { opacity: 0; transform: translate(30px, -68px) rotate(12deg) scale(1.18); } 30% { opacity: 1; } to { opacity: 1; transform: translate(0, 15px) rotate(-3deg) scale(.97); } }
+@keyframes document-ink-settle { from { opacity: .6; transform: rotate(-3deg) scale(1.035); } to { opacity: 1; transform: rotate(-3deg) scale(1); } }
+@media (prefers-reduced-motion: reduce) { .document-stamp-tool { display: none; } .document-stamp-ink { animation: none; } }
+.sound-samples { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.sound-samples button { border: 1px solid #64748b70; border-radius: 7px; padding: 8px 10px; min-height: 44px; color: #234d83; background: #fffaf0; cursor: pointer; font: 600 13px/1.3 system-ui, sans-serif; }
+.sound-samples button:active { transform: translateY(1px); background: #dce7f5; }
+.sound-samples button:disabled { opacity: .45; cursor: default; }
+.sound-samples-note { font: 12px/1.5 system-ui, sans-serif; color: #536174; }
+.gramota--compact .document-stamp { min-height: 0; margin: 4px 0; }
+.gramota--compact .document-stamp-ink { padding: 4px; }
+.gramota--compact .document-stamp-ink strong { font-size: 10px; }
+.gramota--compact .document-stamp-label, .gramota--compact .document-stamp-role { font-size: 8px; }
