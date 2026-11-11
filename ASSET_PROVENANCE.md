@@ -19,6 +19,14 @@ The generated Web Audio sound effects in `src/utils/sounds.js`, CSS artwork and
 repository SVG UI icons are source-code assets covered by the repository license,
 subject to the project owner's confirmation that no third-party work was copied.
 
+## Yandex Games icon generated on 2026-11-11
+
+`release-assets/yandex-icon-512.png` was generated specifically for this project
+with OpenAI image generation. It depicts an original blue school backpack, a
+cream squared-paper notebook with a red numeral 5, and a green chalkboard. The
+prompt required no logos, trademarks, real people, characters or copied game UI.
+The final release file is a 512 × 512 PNG prepared for the Yandex Games catalog.
+
 ## Menu music replaced on 2026-11-10
 
 `src/assets/audio/menu-theme.mp3` is now **Back to school**, by **lorenzobuczek**,
