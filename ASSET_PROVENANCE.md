@@ -27,6 +27,12 @@ cream squared-paper notebook with a red numeral 5, and a green chalkboard. The
 prompt required no logos, trademarks, real people, characters or copied game UI.
 The final release file is a 512 × 512 PNG prepared for the Yandex Games catalog.
 
+`release-assets/yandex-icon-teacher-512.png` is a second, more energetic catalog
+variant generated on the same date with OpenAI image generation. It depicts one
+original female teacher, a red pen, a squared-paper test sheet with the numeral 5,
+and a green chalkboard. The prompt explicitly excluded real-person and celebrity
+likenesses, logos, trademarks, copied characters, screenshots and interface elements.
+
 ## Menu music replaced on 2026-11-10
 
 `src/assets/audio/menu-theme.mp3` is now **Back to school**, by **lorenzobuczek**,
