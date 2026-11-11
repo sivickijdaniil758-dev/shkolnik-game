@@ -10,6 +10,12 @@ export const SLOT_KEYS = {
 
 export const ACTIVE_SLOT_KEY = 'schoolboy-active-save-slot'
 
+const DELETED_SLOT_KEYS = {
+  1: 'schoolboy-deleted-save-slot-1',
+  2: 'schoolboy-deleted-save-slot-2',
+  3: 'schoolboy-deleted-save-slot-3',
+}
+
 const LEGACY_PROGRESS_KEYS = [
   'schoolboy-progress-v3',
   'schoolboy-progress-v2',
@@ -52,14 +58,24 @@ export function readSlot(slot) {
 export function writeSlot(slot, data) {
   try {
     localStorage.setItem(SLOT_KEYS[slot], JSON.stringify(data))
+    localStorage.removeItem(DELETED_SLOT_KEYS[slot])
   } catch {
     /* ignore */
   }
 }
 
-export function deleteSlot(slot) {
+export function readSlotDeletedAt(slot) {
+  try {
+    return localStorage.getItem(DELETED_SLOT_KEYS[slot])
+  } catch {
+    return null
+  }
+}
+
+export function deleteSlot(slot, deletedAt = new Date().toISOString()) {
   try {
     localStorage.removeItem(SLOT_KEYS[slot])
+    localStorage.setItem(DELETED_SLOT_KEYS[slot], deletedAt)
   } catch {
     /* ignore */
   }
@@ -128,36 +144,55 @@ export function readAllSlotSummaries() {
 
 export function exportSaveBundle() {
   const slots = {}
+  const deletedSlots = {}
   for (let slot = 1; slot <= SLOT_COUNT; slot += 1) {
     const data = readSlot(slot)
     if (data?.hasProgress) slots[slot] = data
+    const deletedAt = readSlotDeletedAt(slot)
+    if (deletedAt) deletedSlots[slot] = deletedAt
   }
   return {
-    version: 1,
+    version: 2,
     updatedAt: new Date().toISOString(),
     activeSlot: getActiveSlot(),
     slots,
+    deletedSlots,
   }
 }
 
 /** Merge cloud data per slot without overwriting a newer local session. */
 export function importSaveBundle(bundle) {
-  if (!bundle || bundle.version !== 1 || typeof bundle.slots !== 'object') return false
+  if (
+    !bundle ||
+    ![1, 2].includes(bundle.version) ||
+    typeof bundle.slots !== 'object'
+  ) return false
   let changed = false
 
   for (let slot = 1; slot <= SLOT_COUNT; slot += 1) {
     const remote = bundle.slots[slot]
-    if (!remote?.hasProgress) continue
     const local = readSlot(slot)
-    const remoteTime = Date.parse(remote.lastPlayedAt || 0)
-    const localTime = Date.parse(local?.lastPlayedAt || 0)
-    if (!local?.hasProgress || remoteTime > localTime) {
+    const remoteSaveTime = remote?.hasProgress ? Date.parse(remote.lastPlayedAt || 0) || 0 : 0
+    const remoteDeletedAt = bundle.deletedSlots?.[slot] ?? null
+    const remoteDeleteTime = Date.parse(remoteDeletedAt || 0) || 0
+    const localSaveTime = local?.hasProgress ? Date.parse(local.lastPlayedAt || 0) || 0 : 0
+    const localDeleteTime = Date.parse(readSlotDeletedAt(slot) || 0) || 0
+    const remoteTime = Math.max(remoteSaveTime, remoteDeleteTime)
+    const localTime = Math.max(localSaveTime, localDeleteTime)
+
+    if (!remoteTime || remoteTime <= localTime) continue
+    if (remoteDeleteTime >= remoteSaveTime) {
+      deleteSlot(slot, remoteDeletedAt)
+      changed = true
+    } else if (remote?.hasProgress) {
       writeSlot(slot, remote)
       changed = true
     }
   }
 
-  if (!getActiveSlot() && bundle.activeSlot) setActiveSlot(bundle.activeSlot)
+  if (!getActiveSlot() && readSlot(bundle.activeSlot)?.hasProgress) {
+    setActiveSlot(bundle.activeSlot)
+  }
   return changed
 }
 

@@ -31,6 +31,9 @@ downloaded using the official Pixabay download button on 2026-11-10.
   page last updated 2026-10-20, checked 2026-11-10).
 - Summary: https://pixabay.com/service/license-summary/
 - Download filename: `lorenzobuczek-back-to-school-147750.mp3`.
+- The in-game copy was transcoded on 2026-11-11 from the downloaded 256 kbps
+  MP3 to a 96 kbps stereo MP3 to reduce loading time. Its SHA-256 is
+  `3d708ffb81b0491e5a7de14f8e587b8b73dbe270e55aa4373f19961aa5f733ee`.
 - Used as background music within the game; do not redistribute or sell it as a
   standalone music download. This asset is excluded from the repository MIT license.
 - Commercial use and adaptation are permitted subject to the license restrictions;

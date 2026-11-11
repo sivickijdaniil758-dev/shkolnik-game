@@ -127,6 +127,7 @@ function App() {
   })
 
   const [slotSummaries, setSlotSummaries] = useState(() => readAllSlotSummaries())
+  const [isPageVisible, setIsPageVisible] = useState(() => !document.hidden)
 
   const answeringRef = useRef(false)
   const answerSubjectRef = useRef(null)
@@ -226,6 +227,7 @@ function App() {
           if (draft) setCharacterDraft(draft)
         } catch {
           deleteSlot(activeSlot)
+          queueCloudSave(exportSaveBundle())
           setSlotSummaries(readAllSlotSummaries())
         }
       }
@@ -279,6 +281,7 @@ function App() {
 
   useEffect(() => {
     const handleVisibility = () => {
+      setIsPageVisible(!document.hidden)
       if (document.hidden) {
         pauseAllMusic()
         suspendEffectsAudio()
@@ -294,10 +297,11 @@ function App() {
   useEffect(() => {
     const active =
       !document.hidden &&
+      isPageVisible &&
       (gameState.screen === SCREENS.subjectQuiz || gameState.screen === SCREENS.finalQuiz)
     setGameplayActive(active)
     return () => setGameplayActive(false)
-  }, [gameState.screen])
+  }, [gameState.screen, isPageVisible])
 
   useEffect(() => {
     const flush = () => flushPendingCloudSave()
@@ -506,6 +510,7 @@ function App() {
       return
     }
     deleteSlot(slot)
+    queueCloudSave(exportSaveBundle())
     setSlotSummaries(readAllSlotSummaries())
     beginNewGameInSlot(slot)
   }
@@ -513,6 +518,7 @@ function App() {
   const handleSlotDelete = (slot) => {
     if (!window.confirm('Удалить это сохранение? Другие слоты не будут затронуты.')) return
     deleteSlot(slot)
+    queueCloudSave(exportSaveBundle())
     setSlotSummaries(readAllSlotSummaries())
     if (gameState.activeSaveSlot === slot) {
       setGameState({ ...getInitialGameState(), screen: SCREENS.saveSlots })
@@ -612,6 +618,7 @@ function App() {
     }
     if (!window.confirm('Сбросить прогресс в текущем сохранении?')) return
     deleteSlot(slot)
+    queueCloudSave(exportSaveBundle())
     setSlotSummaries(readAllSlotSummaries())
     stopSchoolMusic()
     setGameState({ ...getInitialGameState(), screen: SCREENS.start })
@@ -936,6 +943,7 @@ function App() {
 
   useEffect(() => {
     if (
+      !isPageVisible ||
       document.hidden ||
       gameState.screen !== SCREENS.subjectQuiz ||
       gameState.selectedOption ||
@@ -947,10 +955,11 @@ function App() {
       else setGameState((prev) => ({ ...prev, timer: prev.timer - 1 }))
     }, 1000)
     return () => window.clearTimeout(timerId)
-  }, [gameState.screen, gameState.timer, gameState.selectedOption])
+  }, [gameState.screen, gameState.timer, gameState.selectedOption, isPageVisible])
 
   useEffect(() => {
     if (
+      !isPageVisible ||
       document.hidden ||
       gameState.screen !== SCREENS.finalQuiz ||
       gameState.finalSelectedOption ||
@@ -962,7 +971,7 @@ function App() {
       else setGameState((prev) => ({ ...prev, finalTimer: prev.finalTimer - 1 }))
     }, 1000)
     return () => window.clearTimeout(timerId)
-  }, [gameState.screen, gameState.finalTimer, gameState.finalSelectedOption])
+  }, [gameState.screen, gameState.finalTimer, gameState.finalSelectedOption, isPageVisible])
 
   const retryFinal = () => {
     setGameState((prev) => ({
