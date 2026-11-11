@@ -1,20 +1,19 @@
 # Asset provenance and release gate
 
-The files listed below were already present when the release audit began. Git
-history identifies only the committer and contains no source URL, generator
-record, author statement, invoice, stock license or other evidence of rights.
+## Generated artwork
 
-- `src/assets/main-menu-bg.png`
-- `src/assets/chalkboard-menu.png`
-- `src/assets/classroom-bg.png`
-- `src/assets/hero.png`
-- all files in `src/assets/portraits/`
+On 2026-11-10 the project owner confirmed in the project conversation that the
+game pictures were generated for this project with ChatGPT/OpenAI. This statement
+covers the raster artwork in `src/assets/`, including backgrounds, the hero and
+character portraits. The `.webp` portraits are optimized derivatives of those
+generated images.
 
-**Release gate:** do not publish these assets until the project owner records,
-for every file, the creator/source, creation date, applicable license or written
-permission, and a link to the retained evidence. If the origin is unknown,
-replace the file with a newly commissioned, self-created or properly licensed
-asset. A visual resemblance check is not proof of rights.
+The owner should retain the original ChatGPT generation conversations and source
+files with the release records. OpenAI's terms govern the relationship between
+the user and OpenAI, while the project owner remains responsible for checking
+that outputs do not reproduce protected third-party characters, brands, real
+people or other material. This provenance record is not a guarantee that no
+third-party rights exist.
 
 The generated Web Audio sound effects in `src/utils/sounds.js`, CSS artwork and
 repository SVG UI icons are source-code assets covered by the repository license,
